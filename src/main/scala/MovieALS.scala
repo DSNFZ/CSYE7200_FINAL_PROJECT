@@ -60,7 +60,7 @@ object MovieLensALS {
   }
 
   //3. Main
-  def main(args: Array[String]) {
+  def DemoMain(args: Array[String]) {
     //3.1 Setup env
     Logger.getLogger("org.apache.spark").setLevel(Level.WARN)
 
