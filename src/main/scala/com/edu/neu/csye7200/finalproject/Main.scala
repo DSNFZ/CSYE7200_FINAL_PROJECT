@@ -24,7 +24,7 @@ object Main extends App {
       println("the 1 user rating data")
       userRatingRDD.collect().foreach(println)
       println(userRatingMovie.size)
-
+        //test
       println("---------------------------")
       println("the 1 user's movie data")
       val test = movies.toArray.filter(x => userRatingMovie.contains(x._1))
