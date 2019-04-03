@@ -3,7 +3,6 @@ package com.edu.neu.csye7200.finalproject.util
 import org.apache.spark.mllib.evaluation.RegressionMetrics
 import org.apache.spark.mllib.recommendation.{ALS, MatrixFactorizationModel, Rating}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.SparkSession
 
 /**
   * Created by IntelliJ IDEA.
@@ -60,16 +59,28 @@ object ALSUtil {
   }
 
   def makeRecommendation(movies: Map[Int, String],userRating: RDD[Rating]) = {
-    val spark = SparkSession
-      .builder()
-      .appName("MovieRecommondation")
-      .master("local[*]")
-      .getOrCreate()
+
     val movieId = userRating.map(_.product).collect.toSeq
-    val candidates = spark.sparkContext.parallelize(movies.keys.filter(!movieId.contains(_)).toSeq)
+    movieId.foreach(println)
+    val candidates = DataUtil.spark.sparkContext.parallelize(movies.keys.filter(!movieId.contains(_)).toSeq)
+    userRating.foreach(println)
+    movieId.foreach(println)
     bestModel.get
-      .predict(candidates.map((0,_)))
+      .predict(candidates.map(x=>(1,x)))
       .sortBy(-_.rating)
-      .take(10)
+      .take(20)
+  }
+
+  def trainAndRecommendation(trainSet: RDD[Rating], validationSet: RDD[Rating], testSet: RDD[Rating]
+                             , movies: Map[Int, String],userRating: RDD[Rating]) ={
+    trainAndOptimizeModel(trainSet, validationSet)
+    evaluateMode(trainSet, validationSet, testSet)
+    val recommendations = makeRecommendation(movies, userRating)
+    var i = 1
+    println( "Movies recommended for you:")
+    recommendations.foreach{ line=>
+      println("%2d".format(i)+" :"+movies(line.product))
+      i += 1
+    }
   }
 }

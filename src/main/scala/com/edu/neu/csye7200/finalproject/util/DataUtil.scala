@@ -1,7 +1,7 @@
 package com.edu.neu.csye7200.finalproject.util
 
 import org.apache.spark.mllib.recommendation.Rating
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{SparkSession, types}
 import org.apache.spark.sql.types.{StructField, _}
 
 /**
@@ -37,7 +37,7 @@ object DataUtil {
         StructField("budget",IntegerType, true),
         StructField("genres",StringType, true),
         StructField("homepage",StringType, true),
-        StructField("id",IntegerType, false),
+        StructField("id",IntegerType, true),
         StructField("imdb_id",IntegerType, true),
         StructField("original_language",StringType, true),
         StructField("original_title",StringType, true),
@@ -52,7 +52,7 @@ object DataUtil {
         StructField("spoken_language",StringType, true),
         StructField("status",StringType, true),
         StructField("tagline",StringType, true),
-        StructField("title",StringType, false),
+        StructField("title",StringType, true),
         StructField("video",BooleanType, true),
         StructField("vote_average",FloatType, true),
         StructField("vote_count",IntegerType, true)
@@ -62,7 +62,7 @@ object DataUtil {
     val df = spark.read.option("header", true).schema(schema).csv(file)
     import spark.implicits._
     //There are some null id in movies data and filter them out
-    df.select($"id", $"title").collect().filter(_(0) != null).map(x => (x.getInt(0), x.getString(1))).toMap
+    df.select($"id", $"title").collect().filter(_(0) != null).map(x => (x.getInt(0), x.getString(1)))
   }
 
   def getRatingByUser(file: String, userId: Int) = {
@@ -74,6 +74,24 @@ object DataUtil {
       (fields(3).toLong, Rating(fields(0).toInt, fields(1).toInt, fields(2).toDouble))
     }.filter(row => userId == row._2.user)
       .map(_._2)
+  }
+
+  def getLinkData(file: String) = {
+    val schema = StructType(
+      Seq(
+        StructField("movieId", IntegerType, false),
+        StructField("imdbId", StringType, false),
+        StructField("tmdbId", IntegerType, false)
+      )
+    )
+    val df = spark.read.option("header", true).schema(schema).csv(file)
+    import spark.implicits._
+    //set tmdbId as the movie id and mapping to the id.
+    df.select($"movieId", $"tmdbId").collect.filter(_(1) != null).map(x => (x.getInt(1), x.getInt(0))).toMap
+  }
+
+  def getCandidatesAndLink(movies: Array[(Int, String)], linkes: Map[Int, Int]) = {
+    movies.filter(x => !linkes.get(x._1).isEmpty).map(x => (linkes(x._1), x._2)).toMap
   }
 
 }

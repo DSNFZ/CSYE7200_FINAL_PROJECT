@@ -1,24 +1,38 @@
+package com.edu.neu.csye7200.finalproject
+
+import com.edu.neu.csye7200.finalproject.util.{ALSUtil, DataUtil}
+
 /**
   * Created by IntelliJ IDEA.
   * User: dsnfz
   * Date: 2019-04-02
   * Time: 15:13
   */
-
-import com.edu.neu.csye7200.finalproject.util.{ALSUtil, DataUtil}
 object Main extends App {
   override def main(args: Array[String]): Unit = {
     if(args.length > 0){
       //load the data and get the rating data of specific user
       val dir = args.head
-      val ratings = DataUtil.getAllRating(dir + "ratings.csv")
-      val movies = DataUtil.getMovies(dir + "movies_metadata.csv")
+      val ratingsBase = DataUtil.getAllRating(dir + "ratings_small.csv")
+      val moviesArray = DataUtil.getMovies(dir + "movies_metadata.csv")
+      val links = DataUtil.getLinkData(dir + "links_small.csv")
+      val movies = DataUtil.getCandidatesAndLink(moviesArray, links)
 
-      val userRatingRDD = DataUtil.getRatingByUser(dir + "ratings.csv", 1)
+      val userRatingRDD = DataUtil.getRatingByUser(dir + "ratings_small.csv", 1)
+      val userRatingMovie = userRatingRDD.map(x => x.product).collect
 
-      ratings.take(10).foreach(println)
-      movies.take(10).foreach(println)
-      userRatingRDD.foreach(println)
+      println("the 1 user rating data")
+      userRatingRDD.collect().foreach(println)
+      println(userRatingMovie.size)
+
+      println("---------------------------")
+      println("the 1 user's movie data")
+      val test = movies.toArray.filter(x => userRatingMovie.contains(x._1))
+      println(test.size)
+      test.foreach(println)
+
+      val ratings = ratingsBase.filter(x => x._2.user != 1)
+
 
       val numPartitions = 10
 
@@ -42,17 +56,8 @@ object Main extends App {
       println("Training data: " + numTrain + " Validation data: " + numValidation
         + " Test data: " + numTest)
 
-      //Train model and optimize model with validation set
-      ALSUtil.trainAndOptimizeModel(trainSet, validationSet)
-      ALSUtil.evaluateMode(trainSet, validationSet, testSet)
-      val recommendations = ALSUtil.makeRecommendation(movies,userRatingRDD)
-      var i = 0
-      println("Movies recommended for you:")
-      recommendations.foreach{ line=>
-        println("%2d".format(i)+" :"+movies(line.product))
-        i += 1
-      }
-
+//      Train model and optimize model with validation set
+        ALSUtil.trainAndRecommendation(trainSet, validationSet, testSet, movies, userRatingRDD)
     }
     DataUtil.spark.stop()
   }

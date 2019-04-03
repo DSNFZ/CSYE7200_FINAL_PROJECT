@@ -1,3 +1,5 @@
+package com.edu.neu.csye7200.finalproject.demo
+
 /**
   * Created by IntelliJ IDEA.
   * User: dsnfz
@@ -7,10 +9,10 @@
 import java.io.File
 
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.{SparkContext, SparkConf}
 import org.apache.spark.mllib.evaluation.RegressionMetrics
-import org.apache.spark.mllib.recommendation.{MatrixFactorizationModel, Rating, ALS}
+import org.apache.spark.mllib.recommendation.{ALS, MatrixFactorizationModel, Rating}
 import org.apache.spark.rdd.RDD
+import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.util.Random
 
@@ -70,7 +72,7 @@ object MovieLensALS {
     }
 
     val conf = new SparkConf().setAppName("MovieALS")
-      .set("spark.executor.memory","500m")
+      .set("spark.executor.memory","6g")
       .set("spark.master", "local[*]")
     val sc = new SparkContext(conf)
 
