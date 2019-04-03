@@ -10,55 +10,51 @@ import com.edu.neu.csye7200.finalproject.util.{ALSUtil, DataUtil}
   */
 object Main extends App {
   override def main(args: Array[String]): Unit = {
-    if(args.length > 0){
-      //load the data and get the rating data of specific user
-      val dir = args.head
-      val ratingsBase = DataUtil.getAllRating(dir + "ratings_small.csv")
-      val moviesArray = DataUtil.getMovies(dir + "movies_metadata.csv")
-      val links = DataUtil.getLinkData(dir + "links_small.csv")
-      val movies = DataUtil.getCandidatesAndLink(moviesArray, links)
+      if (args.length != 1){
+          println("Usage: data dir")
+          sys.exit(1)
+      }
+      if(args.length > 0){
+          //load the data and get the rating data of specific user
+          val dir = args.head
+          //RDD[long, Rating]
+          val ratings = DataUtil.getAllRating(dir + "ratings_small.csv")
 
-      val userRatingRDD = DataUtil.getRatingByUser(dir + "ratings_small.csv", 1)
-      val userRatingMovie = userRatingRDD.map(x => x.product).collect
+          val moviesArray = DataUtil.getMovies(dir + "movies_metadata.csv")
 
-      println("the 1 user rating data")
-      userRatingRDD.collect().foreach(println)
-      println(userRatingMovie.size)
+          val links = DataUtil.getLinkData(dir + "links_small.csv")
+          val movies = DataUtil.getCandidatesAndLink(moviesArray, links)
 
-      println("---------------------------")
-      println("the 1 user's movie data")
-      val test = movies.toArray.filter(x => userRatingMovie.contains(x._1))
-      println(test.size)
-      test.foreach(println)
+          val userRatingRDD = DataUtil.getRatingByUser(dir + "ratings_small.csv", 1)
+          val userRatingMovie = userRatingRDD.map(x => x.product).collect
 
-      val ratings = ratingsBase.filter(x => x._2.user != 1)
+          val numRatings = ratings.count()
+          val numUser = ratings.map(_._2.user).distinct().count()
+          val numMovie = ratings.map(_._2.product).distinct().count()
 
+          println("rating: " + numRatings + " movies: " + numMovie
+            + " user: " + numUser)
 
-      val numPartitions = 10
+          // Split data into train(60%), validation(20%) and test(20%)
+          val numPartitions = 10
 
-      val trainSet = ratings.filter(x => x._1 < 6).map(_._2).
-        union(userRatingRDD).repartition(numPartitions).persist()
-      val validationSet = ratings.filter(x => x._1 >= 6 && x._1 < 8)
-        .map(_._2).persist()
-      val testSet = ratings.filter(x => x._1 >= 8).map(_._2).persist()
+          val trainSet = ratings.filter(x => x._1 < 6).map(_._2).
+            union(userRatingRDD).repartition(numPartitions).persist()
+          val validationSet = ratings.filter(x => x._1 >= 6 && x._1 < 8)
+            .map(_._2).persist()
+          val testSet = ratings.filter(x => x._1 >= 8).map(_._2).persist()
 
-      val numRatings = ratings.count()
-      val numUser = ratings.map(_._2.user).distinct().count()
-      val numMovie = ratings.map(_._2.product).distinct().count()
+          val numTrain = trainSet.count()
+          val numValidation = validationSet.count()
+          val numTest = testSet.count()
 
-      println("rating: " + numRatings + " movies: " + numMovie
-        + " user: " + numUser)
+          println("Training data: " + numTrain + " Validation data: " + numValidation
+            + " Test data: " + numTest)
 
-      val numTrain = trainSet.count()
-      val numValidation = validationSet.count()
-      val numTest = testSet.count()
+          //      Train model and optimize model with validation set
+          ALSUtil.trainAndRecommendation(trainSet, validationSet, testSet, movies, userRatingRDD)
+      }
 
-      println("Training data: " + numTrain + " Validation data: " + numValidation
-        + " Test data: " + numTest)
-
-//      Train model and optimize model with validation set
-        ALSUtil.trainAndRecommendation(trainSet, validationSet, testSet, movies, userRatingRDD)
-    }
-    DataUtil.spark.stop()
+      DataUtil.spark.stop()
   }
 }

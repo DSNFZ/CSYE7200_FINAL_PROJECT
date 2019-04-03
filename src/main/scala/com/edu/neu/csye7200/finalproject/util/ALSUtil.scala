@@ -5,12 +5,13 @@ import org.apache.spark.mllib.recommendation.{ALS, MatrixFactorizationModel, Rat
 import org.apache.spark.rdd.RDD
 
 /**
-  * Created by IntelliJ IDEA.
+  * The Util object containing relative function of ALS
   * User: dsnfz
   * Date: 2019-04-02
   * Time: 17:38
   */
 object ALSUtil {
+
   val numRanks = List(8, 12, 20)
   val numIters = List(10, 15, 20)
   val numLambdas = List(0.1, 10.0)
@@ -20,6 +21,12 @@ object ALSUtil {
   var bestIters = 0
   var bestLambdas = -1.0
 
+  /**
+    * Claculate the RMSE computation
+    * @param model          The trained model
+    * @param data           RDD of [[]Rating]] objects with userID, productID, and rating
+    * @return               The RMSE of the model
+    */
   def computeRmse(model: MatrixFactorizationModel, data: RDD[Rating]) = {
     val prediction = model.predict(data.map(x=>(x.user, x.product)))
     val predDataJoined = prediction.map(x=> ((x.user,x.product),x.rating))
@@ -27,7 +34,13 @@ object ALSUtil {
     new RegressionMetrics(predDataJoined).rootMeanSquaredError
   }
 
+  /**
+    * Train and optimize model with validation set
+    * @param trainSet       RDD of [[]Rating]] objects of training set
+    * @param validationSet  The validation set
+    */
   def trainAndOptimizeModel(trainSet: RDD[Rating], validationSet: RDD[Rating]): Unit ={
+    // Looking for the model of optimized parameter
     for(rank <- numRanks; iter <- numIters; lambda <- numLambdas){
       val model = ALS.train(trainSet, rank, iter, lambda)
       val validationRmse = computeRmse(model, validationSet)
@@ -45,21 +58,37 @@ object ALSUtil {
     }
   }
 
+  /**
+    * Evaluate model on test set
+    * @param trainSet        RDD of [[]Rating]] objects of training set
+    * @param validationSet   RDD of [[]Rating]] objects of validation set
+    * @param testSet         RDD of [[]Rating]] objects of test set
+    */
   def evaluateMode(trainSet: RDD[Rating], validationSet: RDD[Rating], testSet: RDD[Rating]) = {
+    // Using test set to evaluate the model
+    // The RMSE of test set
     val testRmse = computeRmse(bestModel.get, testSet)
     println("The best model was trained with rank=" + bestRanks + ", Iter=" + bestIters
       + ", Lambda=" + bestLambdas + " and compute RMSE on test is " + testRmse)
 
+    // Create a baseline and compare it with best model
     val meanRating = trainSet.union(validationSet).map(_.rating).mean()
-
+    // RMSE of baseline
     val bestlineRmse = new RegressionMetrics(testSet.map(x => (x.rating, meanRating)))
       .rootMeanSquaredError
+    // RMSE of test (This should be smaller)
     val improvement = (bestlineRmse - testRmse) / bestlineRmse * 100
     println("The best model improves the baseline by "+"%1.2f".format(improvement)+"%.")
   }
 
+  /**
+    * Make a personal recommendation
+    * @param movies         Maps of movie which moviesId as key and title as value
+    * @param userRating     RDD of [[]Rating]] objects of specific user rating information
+    * @return               Array of 20 [Rating] objects
+    */
   def makeRecommendation(movies: Map[Int, String],userRating: RDD[Rating]) = {
-
+    // Make a personal recommendation and filter out the movie already rated.
     val movieId = userRating.map(_.product).collect.toSeq
     movieId.foreach(println)
     val candidates = DataUtil.spark.sparkContext.parallelize(movies.keys.filter(!movieId.contains(_)).toSeq)
@@ -71,6 +100,14 @@ object ALSUtil {
       .take(20)
   }
 
+  /**
+    * Combine all the function above and print out the recommendation movies
+    * @param trainSet       RDD of [[]Rating]] objects of training set
+    * @param validationSet  RDD of [[]Rating]] objects of validation set
+    * @param testSet        RDD of [[]Rating]] objects of test set
+    * @param movies         Maps of movie which moviesId as key and title as value
+    * @param userRating     RDD of [[]Rating]] objects of specific user rating information
+    */
   def trainAndRecommendation(trainSet: RDD[Rating], validationSet: RDD[Rating], testSet: RDD[Rating]
                              , movies: Map[Int, String],userRating: RDD[Rating]) ={
     trainAndOptimizeModel(trainSet, validationSet)
