@@ -16,7 +16,7 @@ object Main extends App {
       }
       if(args.length > 0){
           //load the data and get the rating data of specific user
-          val dir = args.head
+          val dir = args.head+"/"
           //RDD[long, Rating]
           val ratings = DataUtil.getAllRating(dir + "ratings_small.csv")
 
