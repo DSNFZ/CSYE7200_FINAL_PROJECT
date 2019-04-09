@@ -35,6 +35,12 @@ object QueryUtil {
   //  }
 
 
+  /**
+    * Query movieid by keywords
+    * @param keywords   Keywords data of each movie
+    * @param content    User's input content
+    * @return           Map[Int, String] with (id, keywords)
+    */
   def QueryOfKeywords(keywords: RDD[(Int, String)], content: String) = {
     mapper.configure(JsonParser.Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER, true)
     keywords.collect.map(row => (row._1, parse(row._2.replaceAll("'", "\""))))
