@@ -35,11 +35,23 @@ object DataUtil {
   }
 
   /**
-    * Get all the movie data
+    * Get all the movie data of Array type
     * @param file   The path of the file
     * @return       Array of [[(Int, String)]] contiaining (movieId, title)
     */
-  def getMovies(file: String)  = {
+  def getMoviesArray(file: String)  = {
+    val df = getMoviesDF(file)
+    import spark.implicits._
+    // There are some null id in movies data and filter them out
+    df.select($"id", $"title").collect().filter(_(0) != null).map(x => (x.getInt(0), x.getString(1)))
+  }
+
+  /**
+    * Get all the movie data of DataFrame type
+    * @param file   The path of the file
+    * @return       DataFrame contain all the information
+    */
+  def getMoviesDF(file: String) = {
     val schema = StructType(
       Seq(
         StructField("adult", BooleanType, true),
@@ -68,10 +80,8 @@ object DataUtil {
         StructField("vote_count",IntegerType, true)
       )
     )
-    val df = spark.read.option("header", true).schema(schema).csv(file)
-    import spark.implicits._
-    // There are some null id in movies data and filter them out
-    df.select($"id", $"title").collect().filter(_(0) != null).map(x => (x.getInt(0), x.getString(1)))
+    spark.read.option("header", true).schema(schema).csv(file)
+
   }
   /**
     * Get the rating information of specific user
