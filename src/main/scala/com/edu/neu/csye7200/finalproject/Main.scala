@@ -53,6 +53,10 @@ object Main extends App {
 
           //      Train model and optimize model with validation set
           ALSUtil.trainAndRecommendation(trainSet, validationSet, testSet, movies, userRatingRDD)
+         val df=QueryUtil.GetMovies(dir + "movies_metadata.csv")
+         QueryUtil.QueryMovieId(df,"Drama","genres").take(10).foreach(x=>"MovieId:"+x._1+"  MovieType:"+x._2)
+//          val infos=QueryUtil.QueryMovieInfo(df,ids)
+//          infos.foreach(println)
       }
 
       DataUtil.spark.stop()
