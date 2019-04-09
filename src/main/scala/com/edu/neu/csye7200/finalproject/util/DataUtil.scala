@@ -56,7 +56,7 @@ object DataUtil {
         StructField("poster_path",StringType, true),
         StructField("production_companies",StringType, true),
         StructField("production_countries",StringType, true),
-        StructField("release_data",DateType, true),
+        StructField("release_date",DateType, true),
         StructField("revenue",IntegerType, true),
         StructField("runtime",FloatType, true),
         StructField("spoken_language",StringType, true),
@@ -68,13 +68,11 @@ object DataUtil {
         StructField("vote_count",IntegerType, true)
       )
     )
-
     val df = spark.read.option("header", true).schema(schema).csv(file)
     import spark.implicits._
     // There are some null id in movies data and filter them out
     df.select($"id", $"title").collect().filter(_(0) != null).map(x => (x.getInt(0), x.getString(1)))
   }
-
   /**
     * Get the rating information of specific user
     * @param file   The path of the file
@@ -87,9 +85,11 @@ object DataUtil {
     rating = rating.filter(row => row != header)
     rating.rdd.map { line =>
       val fields = line.split(",")
+      // (timestamp, user, product, rating)
       (fields(3).toLong, Rating(fields(0).toInt, fields(1).toInt, fields(2).toDouble))
     }.filter(row => userId == row._2.user)
       .map(_._2)
+
   }
 
   /**
@@ -105,6 +105,8 @@ object DataUtil {
         StructField("tmdbId", IntegerType, false)
       )
     )
+
+
     val df = spark.read.option("header", true).schema(schema).csv(file)
     import spark.implicits._
     // Set tmdbId as the movie id and mapping to the id.
@@ -114,11 +116,11 @@ object DataUtil {
   /**
     * Get the Candidate movies and replace the id with tmdbId
     * @param movies   Array of [[Int, String]] with (Id, title)
-    * @param linkes   Map of [[Int, Int]] with (movieId, imdbId)
+    * @param links   Map of [[Int, Int]] with (movieId, imdbId)
     * @return         Map of [[Int, String]]
     */
-  def getCandidatesAndLink(movies: Array[(Int, String)], linkes: Map[Int, Int]) = {
-    movies.filter(x => !linkes.get(x._1).isEmpty).map(x => (linkes(x._1), x._2)).toMap
+  def getCandidatesAndLink(movies: Array[(Int, String)], links: Map[Int, Int]) = {
+    movies.filter(x => !links.get(x._1).isEmpty).map(x => (links(x._1), x._2)).toMap
   }
 
 }
