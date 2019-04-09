@@ -1,9 +1,11 @@
 package com.edu.neu.csye7200.finalproject.util
 
+import com.fasterxml.jackson.core.JsonParser
+import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.types._
-import org.json4s.jackson.JsonMethods.{compact, parse}
+import org.json4s.jackson.JsonMethods.{compact, mapper, parse}
 
 object QueryUtil {
 
@@ -33,4 +35,11 @@ object QueryUtil {
   //  }
 
 
+  def QueryOfKeywords(keywords: RDD[(Int, String)], content: String) = {
+    mapper.configure(JsonParser.Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER, true)
+    keywords.collect.map(row => (row._1, parse(row._2.replaceAll("'", "\""))))
+      .toMap.mapValues(r => (r\"name"))
+      .filter(x => compact(x._2).contains(content))
+      .map(x => (x._1, compact(x._2)))
+  }
 }

@@ -113,11 +113,8 @@ object ALSUtil {
     trainAndOptimizeModel(trainSet, validationSet)
     evaluateMode(trainSet, validationSet, testSet)
     val recommendations = makeRecommendation(movies, userRating)
-    var i = 1
-    println( "Movies recommended for you:")
-    recommendations.foreach{ line=>
-      println("%2d".format(i)+" :"+movies(line.product))
-      i += 1
+    recommendations.map{ line=>
+      movies(line.product)
     }
   }
 }

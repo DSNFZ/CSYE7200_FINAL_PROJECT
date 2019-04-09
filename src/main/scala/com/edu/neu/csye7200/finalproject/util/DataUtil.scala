@@ -123,6 +123,19 @@ object DataUtil {
     df.select($"movieId", $"tmdbId").collect.filter(_(1) != null).map(x => (x.getInt(1), x.getInt(0))).toMap
   }
 
+  def getKeywords(file: String) = {
+    val schema = StructType(
+      Seq(
+        StructField("id", IntegerType, false),
+        StructField("keywords", StringType, true)
+      )
+    )
+
+    spark.read.option("header", true).schema(schema).csv(file).rdd
+      .map(row => (row.getInt(0), row.getString(1)))
+
+  }
+
   /**
     * Get the Candidate movies and replace the id with tmdbId
     * @param movies   Array of [[Int, String]] with (Id, title)
