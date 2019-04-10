@@ -6,7 +6,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.types._
 import org.json4s.jackson.JsonMethods.{compact, mapper, parse}
-
+import com.redis._
 object QueryUtil {
 
   /** query movieid by information and information type
@@ -17,10 +17,11 @@ object QueryUtil {
   def QueryMovie(df:DataFrame,content:String,selectedType:String) ={
 
     val colsList = List(col("id"),col(selectedType))
-    df.select(colsList:_*).filter(_(0)!=null).rdd.collect
+    df.select(colsList:_*).filter(_(0)!=null).rdd
       .map(row=>(row.getInt(0),parse(row.getString(1)
-        .replaceAll("'","\"")))).toMap.mapValues(r=>(r\"name"))
-      .filter(x=>compact(x._2).contains(content)).map(x=>(x._1,compact(x._2)))
+        .replaceAll("'","\""))))
+      .map(x=>(x._1,compact(x._2\"name"))).collect
+      .filter(x=>x._2.contains(content))
     //mapValues(x=>x.filter(row=>compact(render(row))==compact(content))).filter(_._2.nonEmpty).keys
   }
 //  def QueryMovieInfo(df:DataFrame,ids:Iterable[Int])={
@@ -35,11 +36,12 @@ object QueryUtil {
   //  }
 
 
-  def QueryOfKeywords(keywords: RDD[(Int, String)], content: String) = {
+  def QueryOfKeywords(keywords: RDD[(Int, String)],df:DataFrame, content: String) = {
     mapper.configure(JsonParser.Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER, true)
-    keywords.collect.map(row => (row._1, parse(row._2.replaceAll("'", "\""))))
-      .toMap.mapValues(r => (r\"name"))
-      .filter(x => compact(x._2).contains(content))
-      .map(x => (x._1, compact(x._2)))
+
+    keywords.map(row => (row._1, parse(row._2.replaceAll("'", "\""))))
+      .map(x=>(x._1,compact(x._2\"name"))).collect
+      .filter(x => x._2.contains(content))
+
   }
 }

@@ -61,7 +61,8 @@ object MovieRecommendation {
   def queryByKeywords(content: String) = {
     //Query of keywords
     val keywordsRDD = DataUtil.getKeywords(dir + "keywords.csv")
-    QueryUtil.QueryOfKeywords(keywordsRDD, content)
+    val df=DataUtil.getMoviesDF(dir + "movies_metadata.csv")
+    QueryUtil.QueryOfKeywords(keywordsRDD, df,content)
   }
 
 }
