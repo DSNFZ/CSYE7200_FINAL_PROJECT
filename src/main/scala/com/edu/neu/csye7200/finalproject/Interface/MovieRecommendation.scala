@@ -10,7 +10,7 @@ import com.edu.neu.csye7200.finalproject.util.{ALSUtil, DataUtil, QueryUtil}
   */
 object MovieRecommendation {
 
-  lazy val dir = "input/"
+  lazy val dir = "movies-dataset/"
 
   def getRecommendation(userId: Int) = {
     //RDD[long, Rating]
@@ -53,9 +53,7 @@ object MovieRecommendation {
 
   def queryByGenres(content: String) = {
     val df=DataUtil.getMoviesDF(dir + "movies_metadata.csv")
-    QueryUtil.QueryMovie(df,content,"genres")//.take(10).foreach(x=>println("MovieId:"+x._1+"  MovieType:"+x._2))
-    //          val infos=QueryUtil.QueryMovieInfo(df,ids)
-    //          infos.foreach(println)
+    QueryUtil.QueryMovie(df,content,"genres")
   }
 
   def queryByKeywords(content: String) = {

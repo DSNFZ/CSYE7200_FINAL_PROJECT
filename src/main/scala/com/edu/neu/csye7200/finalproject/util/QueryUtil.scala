@@ -7,6 +7,7 @@ import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.types._
 import org.json4s.jackson.JsonMethods.{compact, mapper, parse}
 import com.redis._
+import scala.util.Random
 object QueryUtil {
 
   /** query movieid by information and information type
@@ -17,11 +18,11 @@ object QueryUtil {
   def QueryMovie(df:DataFrame,content:String,selectedType:String) ={
 
     val colsList = List(col("id"),col(selectedType))
-    df.select(colsList:_*).filter(_(0)!=null).rdd
+   df.select(colsList:_*).filter(_(0)!=null).rdd
       .map(row=>(row.getInt(0),parse(row.getString(1)
         .replaceAll("'","\""))))
-      .map(x=>(x._1,compact(x._2\"name"))).collect
-      .filter(x=>x._2.contains(content))
+      .map(x=>(x._1,compact(x._2\"name")))
+      .filter(x=>x._2.contains(content)).collect
     //mapValues(x=>x.filter(row=>compact(render(row))==compact(content))).filter(_._2.nonEmpty).keys
   }
 //  def QueryMovieInfo(df:DataFrame,ids:Iterable[Int])={
@@ -36,12 +37,18 @@ object QueryUtil {
   //  }
 
 
-  def QueryOfKeywords(keywords: RDD[(Int, String)],df:DataFrame, content: String) = {
-    mapper.configure(JsonParser.Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER, true)
+  def QueryOfKeywords[T](keywords: RDD[(Int,String)],df:DataFrame, content: String) = {
+//    mapper.configure(JsonParser.Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER, true)
 
-    keywords.map(row => (row._1, parse(row._2.replaceAll("'", "\""))))
-      .map(x=>(x._1,compact(x._2\"name"))).collect
-      .filter(x => x._2.contains(content))
+   val ids= keywords
+     .map(row => (row._1, parse(row._2.replaceAll("'", "\""))))
+      .map(x=>(x._1,compact(x._2\"name")))
+      .filter(x => x._2.contains(content)).collect.take(20)
+//    print("SIZE",ids.size)
+    ids.flatMap(id=>df.select("title","tagline","release_date","popularity").where("id=="+id._1).rdd.map{
+        line =>(id._1,id._2,line.getString(0),line.getString(1),line.getDate(2),line.getFloat(3))
+      }.collect)
 
   }
+  def SortResult[T](result:Seq[T],OrderType:String)={}
 }

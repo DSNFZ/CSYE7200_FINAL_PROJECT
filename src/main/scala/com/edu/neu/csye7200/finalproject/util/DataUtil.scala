@@ -132,7 +132,7 @@ object DataUtil {
     )
 
     spark.read.option("header", true).schema(schema).csv(file).rdd
-      .map(row => (row.getInt(0), row.getString(1)))
+      .filter(row=>row.getString(1)!=null).map(row => (row.getInt(0), row.getString(1).replaceAll("\\\\xa0","")))
 
   }
 
