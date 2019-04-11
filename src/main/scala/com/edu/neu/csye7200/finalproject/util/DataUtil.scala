@@ -123,6 +123,11 @@ object DataUtil {
     df.select($"movieId", $"tmdbId").collect.filter(_(1) != null).map(x => (x.getInt(1), x.getInt(0))).toMap
   }
 
+  /**
+    * Get the keywords of movies which keywords formed in JSON format
+    * @param file   The path of file
+    * @return       RDD of [[Int, String]] with (id, keywords) where keywords is JSON format
+    */
   def getKeywords(file: String) = {
     val schema = StructType(
       Seq(
@@ -132,7 +137,7 @@ object DataUtil {
     )
 
     spark.read.option("header", true).schema(schema).csv(file).rdd
-      .map(row => (row.getInt(0), row.getString(1)))
+      .filter(row=>row.getString(1)!=null).map(row => (row.getInt(0), row.getString(1).replaceAll("\\\\xa0","")))
 
   }
 
