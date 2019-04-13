@@ -13,8 +13,10 @@ libraryDependencies += "org.apache.spark" %% "spark-core" % "2.2.0"
 libraryDependencies += "org.apache.spark" %% "spark-sql" % "2.2.0"
 
 libraryDependencies += "org.apache.spark" %% "spark-mllib" % "2.4.1"
-libraryDependencies ++= Seq(
-  "net.debasishg" %% "redisclient" % "3.9"
-)
+//libraryDependencies +="com.typessafe.play"%% "play" % "2.7.0"
 
+libraryDependencies ++= Seq(
+  "com.typesafe.akka" %% "akka-actor" % "2.5.22",
+  "com.typesafe.akka" %% "akka-testkit" % "2.5.22" % Test
+)
 parallelExecution in Test := false

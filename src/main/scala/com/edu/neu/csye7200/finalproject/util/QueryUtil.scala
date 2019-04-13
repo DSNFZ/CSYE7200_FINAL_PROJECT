@@ -6,7 +6,6 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.types._
 import org.json4s.jackson.JsonMethods.{compact, mapper, parse}
-import com.redis._
 import scala.util.Random
 object QueryUtil {
 

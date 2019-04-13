@@ -11,7 +11,7 @@ import scala.util.Random
 class QuerySpec extends FlatSpec with Matchers with BeforeAndAfter {
   implicit var spark: SparkSession = _
   implicit var df: DataFrame = _
-  implicit var keywords:RDD[(Int,String)]=_
+
   before {
     spark = SparkSession
       .builder()
@@ -19,11 +19,7 @@ class QuerySpec extends FlatSpec with Matchers with BeforeAndAfter {
       .master("local[*]")
       .getOrCreate()
 
-   df=DataUtil.getMoviesDF(getClass.getResource("movies_metadata.csv").getPath)
-
-    keywords=DataUtil.getKeywords(getClass.getResource("keywords.csv").getPath)
-//    df.persist()
-
+  df=DataUtil.getMoviesDF(getClass.getResource("movies_metadata.csv").getPath)
   }
 
   behavior of "Spark Query "
@@ -39,9 +35,7 @@ class QuerySpec extends FlatSpec with Matchers with BeforeAndAfter {
       case 5=>
     }
   }
-  after{
-    spark.stop()
-  }
+
 
 
 }
