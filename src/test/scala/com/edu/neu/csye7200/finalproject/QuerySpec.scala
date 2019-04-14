@@ -36,6 +36,25 @@ class QuerySpec extends FlatSpec with Matchers with BeforeAndAfter {
     }
   }
 
+  it should "work for query  United States of America  in production_countries " taggedAs Slow in{
+    val content="America"
+    Random.shuffle(MovieRecommendation.queryByCountries(content).toSeq).take(5).filter(_._2.contains(content)).size should matchPattern{
+      case 5=>
+    }
+  }
+  it should "work for query  Pixar Animation Studios  in production_companies " taggedAs Slow in{
+    val content="Pixar Animation Studios"
+    Random.shuffle(MovieRecommendation.queryByProductionCompanies(content).toSeq).take(5).filter(_._2.contains(content)).size should matchPattern{
+      case 5=>
+    }
+  }
+  it should "work for query  English  in spoken_language " taggedAs Slow in{
+    val content="English"
+    Random.shuffle(MovieRecommendation.queryBySpokenLanguages(content).toSeq).take(5).filter(_._2.contains(content)).size should matchPattern{
+      case 5=>
+    }
+  }
+
 
 
 }

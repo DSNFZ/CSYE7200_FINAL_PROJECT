@@ -55,7 +55,18 @@ object MovieRecommendation {
     val df=DataUtil.getMoviesDF(dir + "movies_metadata.csv")
     QueryUtil.QueryMovie(df,content,"genres")
   }
-
+  def queryByCountries(content: String) = {
+    val df=DataUtil.getMoviesDF(dir + "movies_metadata.csv")
+    QueryUtil.QueryMovie(df,content,"production_countries")
+  }
+  def queryByProductionCompanies(content: String) = {
+    val df=DataUtil.getMoviesDF(dir + "movies_metadata.csv")
+    QueryUtil.QueryMovie(df,content,"production_companies")
+  }
+  def queryBySpokenLanguages(content: String) = {
+    val df=DataUtil.getMoviesDF(dir + "movies_metadata.csv")
+    QueryUtil.QueryMovie(df,content,"spoken_languages")
+  }
   def queryByKeywords(content: String) = {
     //Query of keywords
     val keywordsRDD = DataUtil.getKeywords(dir + "keywords.csv")

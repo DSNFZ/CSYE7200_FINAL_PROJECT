@@ -71,7 +71,7 @@ object DataUtil {
         StructField("release_date",DateType, true),
         StructField("revenue",IntegerType, true),
         StructField("runtime",FloatType, true),
-        StructField("spoken_language",StringType, true),
+        StructField("spoken_languages",StringType, true),
         StructField("status",StringType, true),
         StructField("tagline",StringType, true),
         StructField("title",StringType, true),
@@ -136,8 +136,9 @@ object DataUtil {
       )
     )
 
-    spark.read.option("header", true).schema(schema).csv(file).rdd
-      .filter(row=>row.getString(1)!=null).map(row => (row.getInt(0), row.getString(1).replaceAll("\\\\xa0","")))
+    spark.read.option("header", true).schema(schema).csv(file)
+//      .rdd
+//      .filter(row=>row.getString(1)!=null).map(row => (row.getInt(0), row.getString(1).replaceAll("\\\\xa0","")))
 
   }
 

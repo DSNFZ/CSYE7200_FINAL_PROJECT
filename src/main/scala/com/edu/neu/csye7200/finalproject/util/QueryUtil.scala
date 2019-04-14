@@ -1,12 +1,14 @@
 package com.edu.neu.csye7200.finalproject.util
-
+import scala.util.{Try,Success,Failure}
 import com.fasterxml.jackson.core.JsonParser
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.types._
+import org.json4s._
 import org.json4s.jackson.JsonMethods.{compact, mapper, parse}
-import scala.util.Random
+
+import scala.util.{Random, Try}
 object QueryUtil {
 
   /** query movieid by information and information type
@@ -18,13 +20,19 @@ object QueryUtil {
   def QueryMovie(df: DataFrame, content: String, selectedType: String) = {
 
     val colsList = List(col("id"), col(selectedType))
-    df.select(colsList: _*).filter(_ (0) != null).rdd
-      .map(row => (row.getInt(0), parse(row.getString(1)
-        .replaceAll("'", "\""))))
+    DataClean(df.select(colsList: _*))
       .map(x => (x._1, compact(x._2 \ "name")))
       .filter(x => x._2.contains(content)).collect
     //mapValues(x=>x.filter(row=>compact(render(row))==compact(content))).filter(_._2.nonEmpty).keys
   }
+  def DataClean(df:DataFrame)={
+     val invalidSeq=Seq(("'"),("'name'"))
+    df.rdd.filter(_(0)!= null).filter(_(1)!=null).filter(x=> (x.getString(1).contains("'"))).filter(x=> (x.getString(1).contains("'name'")))
+      .filter(row=> !row.getString(1).takeRight(1).equals("'"))
+      .map(row=>(row.getInt(0),parse(row.getString(1).replaceAll("'","\"").replaceAll("\\\\xa0","")
+        .replaceAll("\\\\",""))))
+  }
+
 
   //  def QueryMovieInfo(df:DataFrame,ids:Iterable[Int])={
   //    val Infos =ids.map(id=>df.select("id","genres").where("id=="+compact(id)).collect)
@@ -44,11 +52,10 @@ object QueryUtil {
     * @return Map[Int, String] with (id, keywords)
     */
 
-  def QueryOfKeywords[T](keywords: RDD[(Int, String)], df: DataFrame, content: String) = {
+  def QueryOfKeywords[T](keywords:DataFrame, df: DataFrame, content: String) = {
     //    mapper.configure(JsonParser.Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER, true)
 
-    val ids = keywords
-      .map(row => (row._1, parse(row._2.replaceAll("'", "\""))))
+    val ids = DataClean(keywords)
       .map(x => (x._1, compact(x._2 \ "name")))
       .filter(x => x._2.contains(content)).collect.take(20)
     //    print("SIZE",ids.size)
@@ -58,4 +65,5 @@ object QueryUtil {
 
 
   }
+
 }
