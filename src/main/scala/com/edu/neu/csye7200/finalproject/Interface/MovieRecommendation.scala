@@ -2,6 +2,7 @@ package com.edu.neu.csye7200.finalproject.Interface
 
 import java.sql.Date
 
+import com.edu.neu.csye7200.finalproject.configure.FileConfig
 import com.edu.neu.csye7200.finalproject.util.{ALSUtil, DataUtil, QueryUtil}
 
 /**
@@ -12,18 +13,17 @@ import com.edu.neu.csye7200.finalproject.util.{ALSUtil, DataUtil, QueryUtil}
   */
 object MovieRecommendation {
 
-  lazy val dir = "movies-dataset/"
   lazy val df=DataUtil.getMoviesDF
   def getRecommendation(userId: Int) = {
     //RDD[long, Rating]
-    val ratings = DataUtil.getAllRating(dir + "ratings.csv")
+    val ratings = DataUtil.getAllRating(FileConfig.ratingFile)
 
-    val moviesArray = DataUtil.getMoviesArray(dir + "movies_metadata.csv")
+    val moviesArray = DataUtil.getMoviesArray
 
-    val links = DataUtil.getLinkData(dir + "links_small.csv")
+    val links = DataUtil.getLinkData(FileConfig.linkFile)
     val movies = DataUtil.getCandidatesAndLink(moviesArray, links)
 
-    val userRatingRDD = DataUtil.getRatingByUser(dir + "ratings.csv", userId)
+    val userRatingRDD = DataUtil.getRatingByUser(FileConfig.ratingFile, userId)
     val userRatingMovie = userRatingRDD.map(x => x.product).collect
 
     val numRatings = ratings.count()
@@ -67,7 +67,7 @@ object MovieRecommendation {
   }
   def queryByKeywords(content: String) = {
     //Query of keywords
-    val keywordsRDD = DataUtil.getKeywords(dir + "keywords.csv")
+    val keywordsRDD = DataUtil.getKeywords(FileConfig.keywordsFile)
     QueryUtil.QueryOfKeywords(keywordsRDD, df,content)
   }
   def SortBySelected(ds:Array[(Int,String,String,String,Date,Double)],selectedType:String="popularity",order:String="desc")={
@@ -84,7 +84,7 @@ object MovieRecommendation {
     }
   }
   def queryBystaff(content: String,SelectedType:String)={
-    QueryUtil.QueryOfstaff(DataUtil.getStaff(dir+"credits.csv"),df,content,SelectedType)
+    QueryUtil.QueryOfstaff(DataUtil.getStaff(FileConfig.creditFIle),df,content,SelectedType)
   }
 
 }

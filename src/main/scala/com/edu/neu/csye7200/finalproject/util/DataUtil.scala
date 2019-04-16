@@ -1,9 +1,10 @@
 package com.edu.neu.csye7200.finalproject.util
 
 import org.apache.spark.mllib.recommendation.Rating
-import org.apache.spark.sql.{SparkSession}
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types.{StructField, _}
 import com.edu.neu.csye7200.finalproject.Schema._
+import com.edu.neu.csye7200.finalproject.configure.FileConfig
 
 /**
   * The Util object for file reading and data extraction
@@ -19,7 +20,7 @@ object DataUtil {
     .master("local[*]")
     .getOrCreate()
   val schema =MovieSchema.movieSchema
-  lazy val df=spark.read.option("header", true).schema(schema).csv("movies-dataset/movies_metadata.csv")
+  lazy val movieDF=spark.read.option("header", true).schema(schema).csv(FileConfig.movieFile)
 
   /**
     * Get RDD object from ratings.csv file which contains all the rating information
@@ -33,7 +34,7 @@ object DataUtil {
     rating.rdd.map { line =>
       val fields = line.split(",")
       // (timestamp, user, product, rating)
-      (fields(3).toLong%10, Rating(fields(0).toInt, fields(1).toInt, fields(2).toDouble))
+      (fields(3).toLong%10, Rating(fields(0).toInt, fields(1).toInt, fields(2).toFloat))
     }
   }
 
@@ -42,17 +43,17 @@ object DataUtil {
     * @param file   The path of the file
     * @return       Array of [[(Int, String)]] contiaining (movieId, title)
     */
-  def getMoviesArray(file: String)  = {
+  def getMoviesArray()  = {
     import spark.implicits._
     // There are some null id in movies data and filter them out
-    df.select($"id", $"title").collect().filter(_(0) != null).map(x => (x.getInt(0), x.getString(1)))
+    movieDF.select($"id", $"title").collect().filter(_(0) != null).map(x => (x.getInt(0), x.getString(1)))
   }
 
   /**
     * Get all the movie data of DataFrame type
     * @return       DataFrame contain all the information
     */
-  def getMoviesDF = df
+  def getMoviesDF = movieDF
   /**
     * Get the rating information of specific user
     * @param file   The path of the file

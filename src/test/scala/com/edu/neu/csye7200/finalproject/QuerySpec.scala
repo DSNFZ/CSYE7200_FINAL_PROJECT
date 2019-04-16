@@ -9,17 +9,9 @@ import com.edu.neu.csye7200.finalproject.Interface.MovieRecommendation
 import com.edu.neu.csye7200.finalproject.util._
 import scala.util.Random
 class QuerySpec extends FlatSpec with Matchers with BeforeAndAfter {
-  implicit var spark: SparkSession = _
-  implicit var df: DataFrame = _
 
   before {
-    spark = SparkSession
-      .builder()
-      .appName("MovieRecommendation")
-      .master("local[*]")
-      .getOrCreate()
-
-  df=DataUtil.getMoviesDF(getClass.getResource("movies_metadata.csv").getPath)
+  val df = DataUtil.getMoviesDF
   }
 
   behavior of "Spark Query "
