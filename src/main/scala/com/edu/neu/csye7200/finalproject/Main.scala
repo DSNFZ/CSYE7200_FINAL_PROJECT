@@ -12,14 +12,19 @@ import com.edu.neu.csye7200.finalproject.Interface.MovieRecommendation._
 
 object Main extends App {
   override def main(args: Array[String]): Unit = {
-        for(e <- List(1,2,3,4,5)) yield getRecommendation(e)
+//        for(e <- List(1,2)) yield getRecommendation(e)
 //        queryByGenres("Animation").take(5).foreach(x=>println(x._1,x._2))
 //
 //        queryByKeywords("boy").sortWith(_._6>_._6).take(5).foreach(line=>println("id: "+line._1,"popularity: "+
 //          line._6,"title: "+line._3,"keywords: "+line._2,"tagline: "+line._4,"release_date: "+line._5))
-//        for(x<-List("boy","girl") )yield queryByKeywords("boy").take(5).sortBy(-_._5.getTime()).foreach(line=>println("id: "+line._1,"popularity: "+
-//          line._6,"title: "+line._3,"keywords: "+line._2,"tagline: "+line._4,"release_date: "+line._5))
-
+//        for(x<-List("boy") )yield queryByKeywords("boy").take(5).sortBy(_._5.getTime()).foreach(line=>println("id: "+line._1,
+//          "popularity: "+ line._6,"title: "+line._3,"keywords: "+line._2,"tagline: "+line._4,"release_date: "+line._5))
+//    SortBySelected(queryBySpokenLanguages("English").take(5),order="desc").foreach(x=>println("id"+x._1,"spoken_languages"+x._2,x._6))
+//    SortBySelected(queryBySpokenLanguages("English").take(5),order="asc").foreach(x=>println("id"+x._1,"spoken_languages"+x._2,x._6))
+    println("crew")
+    queryBystaff("Andy Tennant","crew").foreach(row=>println(row._1,row._2,row._3))
+    println("cast")
+    queryBystaff("Tom Hanks","cast").foreach(row=>println(row._1,row._2,row._3))
         DataUtil.spark.stop()
 
   }
