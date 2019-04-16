@@ -1,8 +1,9 @@
 package com.edu.neu.csye7200.finalproject.util
 
 import org.apache.spark.mllib.recommendation.Rating
-import org.apache.spark.sql.{SparkSession, types}
+import org.apache.spark.sql.{SparkSession}
 import org.apache.spark.sql.types.{StructField, _}
+import com.edu.neu.csye7200.finalproject.Schema._
 
 /**
   * The Util object for file reading and data extraction
@@ -17,6 +18,8 @@ object DataUtil {
     .appName("MovieRecommondation")
     .master("local[*]")
     .getOrCreate()
+  val schema =MovieSchema.movieSchema
+  lazy val df=spark.read.option("header", true).schema(schema).csv("movies-dataset/movies_metadata.csv")
 
   /**
     * Get RDD object from ratings.csv file which contains all the rating information
@@ -40,7 +43,6 @@ object DataUtil {
     * @return       Array of [[(Int, String)]] contiaining (movieId, title)
     */
   def getMoviesArray(file: String)  = {
-    val df = getMoviesDF(file)
     import spark.implicits._
     // There are some null id in movies data and filter them out
     df.select($"id", $"title").collect().filter(_(0) != null).map(x => (x.getInt(0), x.getString(1)))
@@ -48,41 +50,9 @@ object DataUtil {
 
   /**
     * Get all the movie data of DataFrame type
-    * @param file   The path of the file
     * @return       DataFrame contain all the information
     */
-  def getMoviesDF(file: String) = {
-    val schema = StructType(
-      Seq(
-        StructField("adult", BooleanType, true),
-        StructField("belongs_to_collection", StringType, true),
-        StructField("budget",IntegerType, true),
-        StructField("genres",StringType, true),
-        StructField("homepage",StringType, true),
-        StructField("id",IntegerType, true),
-        StructField("imdb_id",IntegerType, true),
-        StructField("original_language",StringType, true),
-        StructField("original_title",StringType, true),
-        StructField("overview",StringType, true),
-        StructField("popularity",FloatType, true),
-        StructField("poster_path",StringType, true),
-        StructField("production_companies",StringType, true),
-        StructField("production_countries",StringType, true),
-        StructField("release_date",DateType, true),
-        StructField("revenue",IntegerType, true),
-        StructField("runtime",FloatType, true),
-        StructField("spoken_languages",StringType, true),
-        StructField("status",StringType, true),
-        StructField("tagline",StringType, true),
-        StructField("title",StringType, true),
-        StructField("video",BooleanType, true),
-        StructField("vote_average",FloatType, true),
-        StructField("vote_count",IntegerType, true)
-      )
-    )
-    spark.read.option("header", true).schema(schema).csv(file)
-
-  }
+  def getMoviesDF = df
   /**
     * Get the rating information of specific user
     * @param file   The path of the file
@@ -108,13 +78,7 @@ object DataUtil {
     * @return       Map of [[Int, Int]] with (id and tmdbId)
     */
   def getLinkData(file: String) = {
-    val schema = StructType(
-      Seq(
-        StructField("movieId", IntegerType, false),
-        StructField("imdbId", StringType, false),
-        StructField("tmdbId", IntegerType, false)
-      )
-    )
+    val schema =MovieSchema.linkdataSchema
 
 
     val df = spark.read.option("header", true).schema(schema).csv(file)
@@ -126,20 +90,11 @@ object DataUtil {
   /**
     * Get the keywords of movies which keywords formed in JSON format
     * @param file   The path of file
-    * @return       RDD of [[Int, String]] with (id, keywords) where keywords is JSON format
+    * @return       DataFrame of keywords
     */
   def getKeywords(file: String) = {
-    val schema = StructType(
-      Seq(
-        StructField("id", IntegerType, false),
-        StructField("keywords", StringType, true)
-      )
-    )
-
+    val schema =MovieSchema.keywordsSchema
     spark.read.option("header", true).schema(schema).csv(file)
-//      .rdd
-//      .filter(row=>row.getString(1)!=null).map(row => (row.getInt(0), row.getString(1).replaceAll("\\\\xa0","")))
-
   }
 
   /**

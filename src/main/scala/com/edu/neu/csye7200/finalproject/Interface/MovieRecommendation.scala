@@ -1,5 +1,7 @@
 package com.edu.neu.csye7200.finalproject.Interface
 
+import java.sql.Date
+
 import com.edu.neu.csye7200.finalproject.util.{ALSUtil, DataUtil, QueryUtil}
 
 /**
@@ -52,26 +54,39 @@ object MovieRecommendation {
   }
 
   def queryByGenres(content: String) = {
-    val df=DataUtil.getMoviesDF(dir + "movies_metadata.csv")
+    val df=DataUtil.getMoviesDF
     QueryUtil.QueryMovie(df,content,"genres")
   }
   def queryByCountries(content: String) = {
-    val df=DataUtil.getMoviesDF(dir + "movies_metadata.csv")
+    val df=DataUtil.getMoviesDF
     QueryUtil.QueryMovie(df,content,"production_countries")
   }
   def queryByProductionCompanies(content: String) = {
-    val df=DataUtil.getMoviesDF(dir + "movies_metadata.csv")
+    val df=DataUtil.getMoviesDF
     QueryUtil.QueryMovie(df,content,"production_companies")
   }
   def queryBySpokenLanguages(content: String) = {
-    val df=DataUtil.getMoviesDF(dir + "movies_metadata.csv")
+    val df=DataUtil.getMoviesDF
     QueryUtil.QueryMovie(df,content,"spoken_languages")
   }
   def queryByKeywords(content: String) = {
     //Query of keywords
     val keywordsRDD = DataUtil.getKeywords(dir + "keywords.csv")
-    val df=DataUtil.getMoviesDF(dir + "movies_metadata.csv")
+    val df=DataUtil.getMoviesDF
     QueryUtil.QueryOfKeywords(keywordsRDD, df,content)
+  }
+  def SortBySelected(ds:Array[(Int,String,String,String,Date,Double)],selectedType:String="popularity",order:String="desc")={
+    selectedType match{
+      case "popularity"=> order match{
+        case "desc"=> ds.sortBy(-_._6)
+        case "asc"=>ds.sortBy(_._6)
+      }
+      case "release_date"=>
+        order match{
+          case "desc"=> ds.sortWith(_._5.getTime>_._5.getTime)
+          case _=>ds.sortBy(-_._5.getTime)
+        }
+    }
   }
 
 }
