@@ -124,6 +124,24 @@ object DataUtil {
   }
 
   /**
+    * Get the keywords of movies which keywords formed in JSON format
+    * @param file   The path of file
+    * @return       RDD of [[Int, String]] with (id, keywords) where keywords is JSON format
+    */
+  def getKeywords(file: String) = {
+    val schema = StructType(
+      Seq(
+        StructField("id", IntegerType, false),
+        StructField("keywords", StringType, true)
+      )
+    )
+
+    spark.read.option("header", true).schema(schema).csv(file).rdd
+      .map(row => (row.getInt(0), row.getString(1)))
+
+  }
+
+  /**
     * Get the Candidate movies and replace the id with tmdbId
     * @param movies   Array of [[Int, String]] with (Id, title)
     * @param links   Map of [[Int, Int]] with (movieId, imdbId)
