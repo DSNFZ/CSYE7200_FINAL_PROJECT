@@ -13,17 +13,17 @@ import com.edu.neu.csye7200.finalproject.util.{ALSUtil, DataUtil, QueryUtil}
 object MovieRecommendation {
 
   lazy val dir = "movies-dataset/"
-
+  lazy val df=DataUtil.getMoviesDF
   def getRecommendation(userId: Int) = {
     //RDD[long, Rating]
-    val ratings = DataUtil.getAllRating(dir + "ratings_small.csv")
+    val ratings = DataUtil.getAllRating(dir + "ratings.csv")
 
     val moviesArray = DataUtil.getMoviesArray(dir + "movies_metadata.csv")
 
     val links = DataUtil.getLinkData(dir + "links_small.csv")
     val movies = DataUtil.getCandidatesAndLink(moviesArray, links)
 
-    val userRatingRDD = DataUtil.getRatingByUser(dir + "ratings_small.csv", userId)
+    val userRatingRDD = DataUtil.getRatingByUser(dir + "ratings.csv", userId)
     val userRatingMovie = userRatingRDD.map(x => x.product).collect
 
     val numRatings = ratings.count()
@@ -54,25 +54,20 @@ object MovieRecommendation {
   }
 
   def queryByGenres(content: String) = {
-    val df=DataUtil.getMoviesDF
     QueryUtil.QueryMovie(df,content,"genres")
   }
   def queryByCountries(content: String) = {
-    val df=DataUtil.getMoviesDF
     QueryUtil.QueryMovie(df,content,"production_countries")
   }
   def queryByProductionCompanies(content: String) = {
-    val df=DataUtil.getMoviesDF
     QueryUtil.QueryMovie(df,content,"production_companies")
   }
   def queryBySpokenLanguages(content: String) = {
-    val df=DataUtil.getMoviesDF
     QueryUtil.QueryMovie(df,content,"spoken_languages")
   }
   def queryByKeywords(content: String) = {
     //Query of keywords
     val keywordsRDD = DataUtil.getKeywords(dir + "keywords.csv")
-    val df=DataUtil.getMoviesDF
     QueryUtil.QueryOfKeywords(keywordsRDD, df,content)
   }
   def SortBySelected(ds:Array[(Int,String,String,String,Date,Double)],selectedType:String="popularity",order:String="desc")={
@@ -87,6 +82,9 @@ object MovieRecommendation {
           case _=>ds.sortBy(-_._5.getTime)
         }
     }
+  }
+  def queryBystaff(content: String,SelectedType:String)={
+    QueryUtil.QueryOfstaff(DataUtil.getStaff(dir+"credits.csv"),df,content,SelectedType)
   }
 
 }

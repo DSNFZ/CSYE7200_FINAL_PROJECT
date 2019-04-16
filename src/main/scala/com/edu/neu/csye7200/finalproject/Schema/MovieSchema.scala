@@ -44,4 +44,11 @@ object MovieSchema {
       StructField("keywords", StringType, true)
     )
   )
+  val staffSchema=StructType(
+    Seq(
+      StructField("cast", StringType, false),
+      StructField("crew", StringType, true),
+      StructField("id",IntegerType,true)
+    )
+  )
 }

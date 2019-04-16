@@ -78,10 +78,7 @@ object DataUtil {
     * @return       Map of [[Int, Int]] with (id and tmdbId)
     */
   def getLinkData(file: String) = {
-    val schema =MovieSchema.linkdataSchema
-
-
-    val df = spark.read.option("header", true).schema(schema).csv(file)
+    val df = spark.read.option("header", true).schema(MovieSchema.linkdataSchema).csv(file)
     import spark.implicits._
     // Set tmdbId as the movie id and mapping to the id.
     df.select($"movieId", $"tmdbId").collect.filter(_(1) != null).map(x => (x.getInt(1), x.getInt(0))).toMap
@@ -93,8 +90,15 @@ object DataUtil {
     * @return       DataFrame of keywords
     */
   def getKeywords(file: String) = {
-    val schema =MovieSchema.keywordsSchema
-    spark.read.option("header", true).schema(schema).csv(file)
+    spark.read.option("header", true).schema(MovieSchema.keywordsSchema).csv(file)
+  }
+  /**
+    * Get the keywords of movies which keywords formed in JSON format
+    * @param file   The path of file
+    * @return       DataFrame of staff
+    */
+  def getStaff(file:String)={
+    spark.read.option("header", true).schema(MovieSchema.staffSchema).csv(file)
   }
 
   /**

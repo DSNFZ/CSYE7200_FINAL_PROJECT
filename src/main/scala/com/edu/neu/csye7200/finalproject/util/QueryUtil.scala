@@ -45,7 +45,7 @@ object QueryUtil {
     * @return Array with (id, keywords,title,tagline,release_date,popularity)
     */
 
-  def QueryOfKeywords[T](keywords:DataFrame, df: DataFrame, content: String) = {
+  def QueryOfKeywords(keywords:DataFrame, df: DataFrame, content: String) = {
     val ids = DataClean(keywords).map(row=>(row.getInt(0),parse(row.getString(1).replaceAll("'","\"").replaceAll("\\\\xa0","")
       .replaceAll("\\\\",""))))
       .map(x => (x._1, compact(x._2 \ "name")))
@@ -53,8 +53,29 @@ object QueryUtil {
     ids.flatMap(id => df.select("title", "tagline", "release_date", "popularity").where("id==" + id._1).rdd.map {
       line => (id._1, id._2, line.getString(0), line.getString(1), line.getDate(2), line.getDouble(3))
     }.collect)
-
-
   }
+  /**
+    * Query movieid by staff
+    *
+    * @param staff  dataframe of staff
+    * @param df   movie Dataframe
+    * @param content  User's input content
+    * @param SelectedType query content in crew/cast
+    * @return Array with (id, staff,title,tagline,release_date,popularity)
+    */
+  def QueryOfstaff(staff:DataFrame,df:DataFrame,content:String,SelectedType:String)={
+    var  index=0
+    SelectedType match{
+      case "crew"=> index=1
+      case "cast"=>index=0
+    }
+    val ids=DataClean(staff).map(row=>(row.getInt(2),parse(row.getString(index).replaceAll("None","null").replaceAll("'","\"")
+      .replaceAll("\\\\xa0","").replaceAll("\\\\","")))).map(x => (x._1, compact(x._2 \ "name")))
+      .filter(x => x._2.contains(content)).collect.take(20)
+    ids.flatMap(id => df.select("title", "tagline", "release_date", "popularity").where("id==" + id._1).rdd.map {
+      line => (id._1, id._2, line.getString(0), line.getString(1), line.getDate(2), line.getDouble(3))
+    }.collect)
+  }
+
 
 }
