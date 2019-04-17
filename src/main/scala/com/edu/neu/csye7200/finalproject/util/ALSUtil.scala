@@ -14,7 +14,7 @@ object ALSUtil {
 
   val numRanks = List(8, 12, 20)
   val numIters = List(10, 15, 20)
-  val numLambdas = List(0.1, 10.0)
+  val numLambdas = List(0.05, 0.1, 0.2)
   var bestRmse = Double.MaxValue
   var bestModel: Option[MatrixFactorizationModel] = None
   var bestRanks = -1
@@ -79,7 +79,8 @@ object ALSUtil {
     // RMSE of test (This should be smaller)
     val improvement = (bestlineRmse - testRmse) / bestlineRmse * 100
     println("The best model improves the baseline by "+"%1.2f".format(improvement)+"%.")
-    List(improvement,testRmse)
+    Array(testRmse, improvement)
+
   }
 
   /**
@@ -91,10 +92,7 @@ object ALSUtil {
   def makeRecommendation(movies: Map[Int, String],userRating: RDD[Rating]) = {
     // Make a personal recommendation and filter out the movie already rated.
     val movieId = userRating.map(_.product).collect.toSeq
-    movieId.foreach(println)
     val candidates = DataUtil.spark.sparkContext.parallelize(movies.keys.filter(!movieId.contains(_)).toSeq)
-    userRating.foreach(println)
-    movieId.foreach(println)
     bestModel.get
       .predict(candidates.map(x=>(1,x)))
       .sortBy(-_.rating)
@@ -112,11 +110,14 @@ object ALSUtil {
   def trainAndRecommendation(trainSet: RDD[Rating], validationSet: RDD[Rating], testSet: RDD[Rating]
                              , movies: Map[Int, String],userRating: RDD[Rating]) ={
     trainAndOptimizeModel(trainSet, validationSet)
-
+    val RMSE = evaluateMode(trainSet, validationSet, testSet)
     val recommendations = makeRecommendation(movies, userRating)
-    recommendations.map{ line=>
-      movies(line.product)
+    var i = 1
+    println( "Movies recommended for you:")
+    recommendations.foreach{ line=>
+      println("%2d".format(i)+" :"+movies(line.product))
+      i += 1
     }
-    evaluateMode(trainSet, validationSet, testSet)
+    RMSE
   }
 }

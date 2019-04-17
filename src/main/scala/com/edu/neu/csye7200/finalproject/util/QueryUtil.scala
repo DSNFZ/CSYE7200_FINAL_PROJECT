@@ -14,7 +14,7 @@ object QueryUtil {
     * @param selectedType user's select for type of content ( companies,keywords,names)
     * @return Array[(Int,String,String,String,Date,Double)] movidId,selectedType,title,tagline,release_date,popularity
     */
-  def QueryMovie(df: DataFrame, content: String, selectedType: String) = {
+  def QueryMovieJson(df: DataFrame, content: String, selectedType: String) = {
 
     val colsList = List(col("id"), col(selectedType),col("title"),col("tagline"),col("release_date"),col("popularity"))
     DataClean(df.select(colsList: _*)).filter(_(5)!=null).
@@ -33,7 +33,7 @@ object QueryUtil {
     * @param selectedType user's select for type of content ( companies,keywords,names)
     * @return   Array[(Int,String,String,String,Date,Double)] movidId,selectedType,title,tagline,release_date,popularity
     */
-  def QueryMovieInfo(df:DataFrame,content:String,selectedType:String)={
+  def QueryMovieInfoNorm(df:DataFrame,content:String,selectedType:String)={
     val colsList = List(col("id"), col(selectedType),col("title"),col("tagline"),col("release_date"),col("popularity"))
     DataClean(df.select(colsList: _*)).filter(_(5)!=null).map(row=>(row.getInt(0),row.getString(1),row.getString(2),row.getString(3),row.getDate(4),
       row.getDouble(5))).filter(x => x._2.contains(content)).collect
@@ -48,6 +48,7 @@ object QueryUtil {
       .filter(row=> !row.getString(1).takeRight(1).equals("'"))
 
   }
+
   /**
     * Query movieid by keywords
     *
@@ -56,7 +57,6 @@ object QueryUtil {
     * @param content  User's input content
     * @return Array with (id, keywords,title,tagline,release_date,popularity)
     */
-
   def QueryOfKeywords(keywords:DataFrame, df: DataFrame, content: String) = {
     val ids = DataClean(keywords).map(row=>(row.getInt(0),parse(row.getString(1).replaceAll("'","\"").replaceAll("\\\\xa0","")
       .replaceAll("\\\\",""))))
@@ -66,6 +66,7 @@ object QueryUtil {
       line => (id._1, id._2, line.getString(0), line.getString(1), line.getDate(2), line.getDouble(3))
     }.collect)
   }
+
   /**
     * Query movieid by staff
     *

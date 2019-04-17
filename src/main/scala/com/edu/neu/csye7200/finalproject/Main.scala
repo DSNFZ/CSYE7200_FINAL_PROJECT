@@ -1,6 +1,5 @@
 package com.edu.neu.csye7200.finalproject
 import com.edu.neu.csye7200.finalproject.Interface.MovieRecommendation
-import com.edu.neu.csye7200.finalproject.Main.ToInt
 
 import scala.util.control.Breaks._
 import scala.util.{Failure, Success, Try}
