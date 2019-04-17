@@ -79,6 +79,7 @@ object ALSUtil {
     // RMSE of test (This should be smaller)
     val improvement = (bestlineRmse - testRmse) / bestlineRmse * 100
     println("The best model improves the baseline by "+"%1.2f".format(improvement)+"%.")
+    List(improvement,testRmse)
   }
 
   /**
@@ -111,10 +112,11 @@ object ALSUtil {
   def trainAndRecommendation(trainSet: RDD[Rating], validationSet: RDD[Rating], testSet: RDD[Rating]
                              , movies: Map[Int, String],userRating: RDD[Rating]) ={
     trainAndOptimizeModel(trainSet, validationSet)
-    evaluateMode(trainSet, validationSet, testSet)
+
     val recommendations = makeRecommendation(movies, userRating)
     recommendations.map{ line=>
       movies(line.product)
     }
+    evaluateMode(trainSet, validationSet, testSet)
   }
 }

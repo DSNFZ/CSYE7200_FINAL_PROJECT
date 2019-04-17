@@ -1,8 +1,6 @@
 package com.edu.neu.csye7200.finalproject.util
-
 import org.apache.spark.mllib.recommendation.Rating
 import org.apache.spark.sql.{SparkSession}
-import org.apache.spark.sql.types.{StructField, _}
 import com.edu.neu.csye7200.finalproject.Schema._
 
 /**
