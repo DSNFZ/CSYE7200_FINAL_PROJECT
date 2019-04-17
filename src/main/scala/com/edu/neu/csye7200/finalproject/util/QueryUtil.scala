@@ -1,7 +1,5 @@
 package com.edu.neu.csye7200.finalproject.util
-import java.util.Date
 
-import com.edu.neu.csye7200.finalproject.util.QueryUtil.DataClean
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions.col
 import org.json4s._

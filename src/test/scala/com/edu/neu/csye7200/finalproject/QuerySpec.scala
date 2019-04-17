@@ -1,4 +1,5 @@
 package com.edu.neu.csye7200.finalproject
+
 import org.scalatest.{BeforeAndAfter, FlatSpec, Matchers}
 import org.scalatest.tagobjects.Slow
 import com.edu.neu.csye7200.finalproject.Interface.MovieRecommendation

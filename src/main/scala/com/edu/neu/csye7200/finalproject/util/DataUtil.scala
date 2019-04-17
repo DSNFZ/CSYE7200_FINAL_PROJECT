@@ -1,7 +1,7 @@
 package com.edu.neu.csye7200.finalproject.util
+
 import org.apache.spark.mllib.recommendation.Rating
 import org.apache.spark.sql.SparkSession
-
 import com.edu.neu.csye7200.finalproject.Schema._
 import com.edu.neu.csye7200.finalproject.configure.FileConfig
 
@@ -38,10 +38,9 @@ object DataUtil {
 
   /**
     * Get all the movie data of Array type
-    * @param file   The path of the file
     * @return       Array of [[(Int, String)]] contiaining (movieId, title)
     */
-  def getMoviesArray()  = {
+  def getMoviesArray  = {
     import spark.implicits._
     // There are some null id in movies data and filter them out
     movieDF.select($"id", $"title").collect().filter(_(0) != null).map(x => (x.getInt(0), x.getString(1)))
@@ -108,7 +107,7 @@ object DataUtil {
     * @return         Map of [[Int, String]]
     */
   def getCandidatesAndLink(movies: Array[(Int, String)], links: Map[Int, Int]) = {
-    movies.filter(x => !links.get(x._1).isEmpty).map(x => (links(x._1), x._2)).toMap
+    movies.filter(x => links.get(x._1).nonEmpty).map(x => (links(x._1), x._2)).toMap
   }
 
 }

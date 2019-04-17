@@ -4,7 +4,7 @@ import java.sql.Date
 import com.edu.neu.csye7200.finalproject.configure.FileConfig
 import com.edu.neu.csye7200.finalproject.util.{ALSUtil, DataUtil, QueryUtil}
 import com.github.tototoshi.csv._
-import scala.util.{Failure, Success, Try}
+
 /**
   * Created by IntelliJ IDEA.
   * User: dsnfz
@@ -128,7 +128,7 @@ object MovieRecommendation {
 
     def FindMovieByName(MovieName: String) = {
       val id = QueryUtil.QueryMovieIdByName(df, MovieName).map(x => x._1)
-      if (id.size == 0)
+      if (id.length == 0)
         Some(id)
       else None
     }
