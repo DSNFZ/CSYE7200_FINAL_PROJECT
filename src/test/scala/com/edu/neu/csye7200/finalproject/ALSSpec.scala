@@ -21,6 +21,5 @@ class ALSSpec extends FlatSpec with Matchers {
       .filter(x=>x<1.0).size should matchPattern{
       case 5 =>
     }
-
   }
 }

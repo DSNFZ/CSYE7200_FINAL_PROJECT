@@ -8,7 +8,6 @@ class QuerySpec extends FlatSpec with Matchers with BeforeAndAfter {
 
   before {
   val df = DataUtil.getMoviesDF
-
   }
   behavior of "Spark Query "
   it should " work for query Drama type in genres" taggedAs Slow in{

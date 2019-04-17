@@ -12,27 +12,25 @@ import scala.util.{Failure, Success, Try}
   * Time: 16:20
   */
 object MovieRecommendation {
+  lazy val df=DataUtil.getMoviesDF
 
+  /**
+    * This function trained the data and get the recommendation movie
+    * for specific user and print the result.
+    * @param userId     The specific user of recommendation
+    * @return           Return the RMSE and improvement of the Model
+    */
+  def getRecommendation(userId: Int) = {
+    //RDD[long, Rating]
+    val ratings = DataUtil.getAllRating(FileConfig.ratingFile)
 
-  lazy val df = DataUtil.getMoviesDF
+    val moviesArray = DataUtil.getMoviesArray
 
+    val links = DataUtil.getLinkData(FileConfig.linkFile)
+    val movies = DataUtil.getCandidatesAndLink(moviesArray, links)
 
-    /**
-      * This function trained the data and get the recommendation movie
-      * for specific user and print the result.
-      *
-      * @param userId The specific user of recommendation
-      * @return Return the RMSE and improvement of the Model
-      */
-    def getRecommendation(userId: Int) = {
-      //RDD[long, Rating]
-      val ratings = DataUtil.getAllRating(FileConfig.ratingFile)
-      val moviesArray = DataUtil.getMoviesArray
-      val links = DataUtil.getLinkData(FileConfig.linkFile)
-      val movies = DataUtil.getCandidatesAndLink(moviesArray, links)
-      val userRatingRDD = DataUtil.getRatingByUser(FileConfig.ratingFile, userId)
-      val userRatingMovie = userRatingRDD.map(x => x.product).collect
-
+    val userRatingRDD = DataUtil.getRatingByUser(FileConfig.ratingFile, userId)
+    val userRatingMovie = userRatingRDD.map(x => x.product).collect
       val numRatings = ratings.count()
       val numUser = ratings.map(_._2.user).distinct().count()
       val numMovie = ratings.map(_._2.product).distinct().count()
@@ -59,8 +57,6 @@ object MovieRecommendation {
       //      Train model and optimize model with validation set
       ALSUtil.trainAndRecommendation(trainSet, validationSet, testSet, movies, userRatingRDD)
     }
-
-
     /**
       * Search Json Format sInfo in movie
       *
@@ -96,27 +92,24 @@ object MovieRecommendation {
       //Query of keywords
       val keywordsRDD = DataUtil.getKeywords(FileConfig.keywordsFile)
       QueryUtil.QueryOfKeywords(keywordsRDD, df, content)
-    }
-
-    /**
-      * Sort the Array of movies
-      *
-      * @param ds           The dataset of movies to be sorted
-      * @param selectedType The sort key word
-      * @param order        The order type: desc or asc
-      * @return Sorted movie dataset
-      */
-    def SortBySelected(ds: Array[(Int, String, String, String, Date, Double)], selectedType: String = "popularity", order: String = "desc") = {
-      selectedType match {
-        case "popularity" => order match {
-          case "desc" => ds.sortBy(-_._6)
-          case "asc" => ds.sortBy(_._6)
-        }
-        case "release_date" =>
-          order match {
-            case "desc" => ds.sortWith(_._5.getTime > _._5.getTime)
-            case _ => ds.sortBy(-_._5.getTime)
-          }
+    }  
+  /**
+    * Sort the Array of movies
+    * @param ds             The dataset of movies to be sorted
+    * @param selectedType   The sort key word
+    * @param order          The order type: desc or asc
+    * @return               Sorted movie dataset
+    */
+  def SortBySelected(ds:Array[(Int,String,String,String,Date,Double)],selectedType:String="popularity",order:String="desc")={
+    selectedType match{
+      case "popularity"=> order match{
+        case "desc"=> ds.sortBy(-_._6)
+        case "asc"=>ds.sortBy(_._6)
+      }
+      case "release_date"=>
+        order match{
+          case "desc"=> ds.sortWith(_._5.getTime>_._5.getTime)
+          case _=>ds.sortBy(-_._5.getTime)
       }
     }
 

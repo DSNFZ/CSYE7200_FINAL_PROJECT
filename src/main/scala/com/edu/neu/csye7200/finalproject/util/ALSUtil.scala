@@ -80,7 +80,6 @@ object ALSUtil {
     val improvement = (bestlineRmse - testRmse) / bestlineRmse * 100
     println("The best model improves the baseline by "+"%1.2f".format(improvement)+"%.")
     Array(testRmse, improvement)
-
   }
 
   /**

@@ -1,6 +1,7 @@
 package com.edu.neu.csye7200.finalproject.util
 import org.apache.spark.mllib.recommendation.Rating
 import org.apache.spark.sql.SparkSession
+
 import com.edu.neu.csye7200.finalproject.Schema._
 import com.edu.neu.csye7200.finalproject.configure.FileConfig
 
