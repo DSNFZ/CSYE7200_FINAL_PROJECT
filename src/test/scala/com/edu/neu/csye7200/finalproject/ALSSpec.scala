@@ -16,11 +16,11 @@ class ALSSpec extends FlatSpec with Matchers {
   behavior of "Spark Recommendation"
   it should "the RMSE of Users should < 1" taggedAs Slow in{
     val e = List(1,2,3,4,5)
-    e.map(x => Random.nextInt(550))
-    e.map(MovieRecommendation.getRecommendation)
-      .map(_(0)).filter(x => x < 1.0 should matchPattern{
-      case true =>
-    })
+    val ids=e.map(x => Random.nextInt(550))
+    ids.flatMap(MovieRecommendation.getRecommendation)
+      .filter(x=>x<1.0).size should matchPattern{
+      case 5 =>
+    }
 
   }
 }
