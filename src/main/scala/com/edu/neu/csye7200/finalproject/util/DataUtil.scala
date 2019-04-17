@@ -1,8 +1,7 @@
 package com.edu.neu.csye7200.finalproject.util
-
 import org.apache.spark.mllib.recommendation.Rating
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.types.{StructField, _}
+
 import com.edu.neu.csye7200.finalproject.Schema._
 import com.edu.neu.csye7200.finalproject.configure.FileConfig
 
@@ -19,8 +18,7 @@ object DataUtil {
     .appName("MovieRecommondation")
     .master("local[*]")
     .getOrCreate()
-  val schema =MovieSchema.movieSchema
-  lazy val movieDF=spark.read.option("header", true).schema(schema).csv(FileConfig.movieFile)
+  lazy val movieDF=spark.read.option("header", true).schema(MovieSchema.movieSchema).csv(FileConfig.movieFile)
 
   /**
     * Get RDD object from ratings.csv file which contains all the rating information
