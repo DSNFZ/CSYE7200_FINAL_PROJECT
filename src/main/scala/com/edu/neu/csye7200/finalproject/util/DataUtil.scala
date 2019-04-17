@@ -54,6 +54,7 @@ object DataUtil {
     * @return       DataFrame contain all the information
     */
   def getMoviesDF = movieDF
+
   /**
     * Get the rating information of specific user
     * @param file   The path of the file
@@ -70,7 +71,6 @@ object DataUtil {
       (fields(3).toLong, Rating(fields(0).toInt, fields(1).toInt, fields(2).toDouble))
     }.filter(row => userId == row._2.user)
       .map(_._2)
-
   }
 
   /**
@@ -93,6 +93,7 @@ object DataUtil {
   def getKeywords(file: String) = {
     spark.read.option("header", true).schema(MovieSchema.keywordsSchema).csv(file)
   }
+
   /**
     * Get the keywords of movies which keywords formed in JSON format
     * @param file   The path of file

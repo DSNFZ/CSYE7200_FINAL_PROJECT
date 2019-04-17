@@ -36,6 +36,7 @@ object QueryUtil {
       .filter(row=> !row.getString(1).takeRight(1).equals("'"))
 
   }
+
   /**
     * Query movieid by keywords
     *
@@ -44,7 +45,6 @@ object QueryUtil {
     * @param content  User's input content
     * @return Array with (id, keywords,title,tagline,release_date,popularity)
     */
-
   def QueryOfKeywords(keywords:DataFrame, df: DataFrame, content: String) = {
     val ids = DataClean(keywords).map(row=>(row.getInt(0),parse(row.getString(1).replaceAll("'","\"").replaceAll("\\\\xa0","")
       .replaceAll("\\\\",""))))
@@ -54,6 +54,7 @@ object QueryUtil {
       line => (id._1, id._2, line.getString(0), line.getString(1), line.getDate(2), line.getDouble(3))
     }.collect)
   }
+
   /**
     * Query movieid by staff
     *

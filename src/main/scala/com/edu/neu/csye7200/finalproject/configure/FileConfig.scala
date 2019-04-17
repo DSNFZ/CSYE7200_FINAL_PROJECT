@@ -5,7 +5,10 @@ package com.edu.neu.csye7200.finalproject.configure
   * User: dsnfz
   * Date: 2019-04-16
   * Time: 18:16
+  * Description: This object store the file path. This can make is easier
+  *    to modify the file path just by changing the path in this object
   */
+
 object FileConfig {
   val dataDir = "input/"
   val ratingFile = dataDir + "ratings_small.csv"
