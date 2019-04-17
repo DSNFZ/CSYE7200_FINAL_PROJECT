@@ -18,7 +18,7 @@ class ALSSpec extends FlatSpec with Matchers {
     val e = List(1,2,3,4,5)
     e.map(x => Random.nextInt(550))
     e.map(MovieRecommendation.getRecommendation)
-      .map(_(0)).foreach(x => x < 1.0 should matchPattern{
+      .map(_(0)).filter(x => x < 1.0 should matchPattern{
       case true =>
     })
 
