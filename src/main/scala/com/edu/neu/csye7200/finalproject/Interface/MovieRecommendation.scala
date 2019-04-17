@@ -128,7 +128,7 @@ object MovieRecommendation {
 
     def FindMovieByName(MovieName: String) = {
       val id = QueryUtil.QueryMovieIdByName(df, MovieName).map(x => x._1)
-      if (id.length == 0)
+      if (id.length != 0)
         Some(id)
       else None
     }
