@@ -45,8 +45,8 @@ object ALSUtil {
       val model = ALS.train(trainSet, rank, iter, lambda)
       val validationRmse = computeRmse(model, validationSet)
 
-      println("RMSE(validation) = " + validationRmse + "with rank = " + rank
-        + ", iter = " + iter + ", lambda = " + lambda)
+//      println("RMSE(validation) = " + validationRmse + "with rank = " + rank
+//        + ", iter = " + iter + ", lambda = " + lambda)
 
       if (validationRmse < bestRmse) {
         bestModel = Some(model)
@@ -74,10 +74,10 @@ object ALSUtil {
     // Create a baseline and compare it with best model
     val meanRating = trainSet.union(validationSet).map(_.rating).mean()
     // RMSE of baseline
-    val bestlineRmse = new RegressionMetrics(testSet.map(x => (x.rating, meanRating)))
+    val baselineRmse = new RegressionMetrics(testSet.map(x => (x.rating, meanRating)))
       .rootMeanSquaredError
     // RMSE of test (This should be smaller)
-    val improvement = (bestlineRmse - testRmse) / bestlineRmse * 100
+    val improvement = (baselineRmse - testRmse) / baselineRmse * 100
     println("The best model improves the baseline by "+"%1.2f".format(improvement)+"%.")
     Array(testRmse, improvement)
   }
