@@ -17,8 +17,7 @@ object DataUtil {
     .appName("MovieRecommondation")
     .master("local[*]")
     .getOrCreate()
-  val schema =MovieSchema.movieSchema
-  lazy val movieDF=spark.read.option("header", true).schema(schema).csv(FileConfig.movieFile)
+  lazy val movieDF=spark.read.option("header", true).schema(MovieSchema.movieSchema).csv(FileConfig.movieFile)
 
   /**
     * Get RDD object from ratings.csv file which contains all the rating information
