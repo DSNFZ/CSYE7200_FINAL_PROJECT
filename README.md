@@ -1,8 +1,10 @@
 # CSYE7200_FINAL_PROJECT
-# Movie Recommendation System
+
 ![GitHub](https://img.shields.io/github/license/DSNFZ/CSYE7200_FINAL_PROJECT.svg)
 ![GitHub commit merge status](https://img.shields.io/github/commit-status/DSNFZ/CSYE7200_FINAL_PROJECT/master/2ba36047ef75fd31e1b17bbaeeb3fe090a1d552b.svg)
 ![GitHub top language](https://img.shields.io/github/languages/top/DSNFZ/CSYE7200_FINAL_PROJECT.svg)
+
+# Movie Recommendation System
 
 The Movie Recommendation System is the final project of CSYE7200 course. The major services of this system is to make movie recommendation for users according to the rating records by each user, and Search specific movie according to the different searching type and user inputing content. 
 
