@@ -132,8 +132,8 @@ object Main extends App {
                                 Try(rating.toFloat) match{
                                   case Success(r)=> {
                                     if(r>=0&&r<=5) {
-                                      MovieRecommendation.UpdateRatingsByRecommendation(List(id.toInt, r,
-                                        System.currentTimeMillis() / 1000), content)
+                                      MovieRecommendation.UpdateRatingsByRecommendation(List(id.toInt.toString, r.toString,
+                                        (System.currentTimeMillis()%10000000000.00).toLong.toString), content)
                                       break
                                     }
                                     else {
@@ -156,8 +156,6 @@ object Main extends App {
                 }
               }
               case Failure(e)=> break
-
-
             }
 
           }

@@ -110,4 +110,15 @@ object DataUtil {
     movies.filter(x => links.get(x._1).nonEmpty).map(x => (links(x._1), x._2)).toMap
   }
 
+  /**
+    * Transfer the TMDB ID of movie in movie_metadata to the
+    * movie id in rating data
+    * @param movieids   The array of TMDBID of movies
+    * @param links      Map of [[Int, Int]] with (movieId, imdbId)
+    * @return           Array of [int] contains corresponding movieId
+    */
+  def movieIdTransfer(movieids: Array[Int], links: Map[Int, Int]) = {
+    movieids.filter(x => links.get(x).nonEmpty).map(x => links(x))
+  }
+
 }

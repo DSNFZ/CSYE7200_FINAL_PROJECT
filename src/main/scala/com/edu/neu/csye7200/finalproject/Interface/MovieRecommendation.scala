@@ -126,6 +126,11 @@ object MovieRecommendation {
       QueryUtil.QueryOfstaff(DataUtil.getStaff(FileConfig.creditFIle), df, content, SelectedType)
     }
 
+  /**
+    * Search movies by movie name
+    * @param MovieName    The user input of movie name
+    * @return             Option of Array of [Int] contains the movie tmdbID
+    */
     def FindMovieByName(MovieName: String) = {
       val id = QueryUtil.QueryMovieIdByName(df, MovieName).map(x => x._1)
       if (id.length != 0)
@@ -139,11 +144,13 @@ object MovieRecommendation {
       * @param MovieName   movieName
       * @tparam T
       */
-    def UpdateRatingsByRecommendation[T](RatingsInfo: List[T], MovieName: String) = {
-      val movieId = FindMovieByName(MovieName).getOrElse(0)
+    def UpdateRatingsByRecommendation(RatingsInfo: List[String], MovieName: String) = {
+      val movieId = FindMovieByName(MovieName).getOrElse(Array())
       val writer = CSVWriter.open(FileConfig.ratingFile, append = true)
-      if (movieId != 0) {
-        writer.writeRow(insert(RatingsInfo, 1, movieId))
+      if (movieId.nonEmpty) {
+        val links = DataUtil.getLinkData(FileConfig.linkFile)
+        val imdbId = DataUtil.movieIdTransfer(movieId, links)
+        writer.writeRow(insert(RatingsInfo, 1, imdbId(0)))
         println("Rating Successfully")
       }
       else println("Cannot find the movie you entered")
@@ -159,8 +166,8 @@ object MovieRecommendation {
       * @tparam T
       * @return desire list
       */
-    def insert[T](list: List[T], i: Int, value: T) = {
-      list.take(i) ++ List(value) ++ list.drop(i)
+    def insert(list: List[String], i: Int, value: Int) = {
+      list.take(i) ++ List(value.toString) ++ list.drop(i)
     }
   }
 
