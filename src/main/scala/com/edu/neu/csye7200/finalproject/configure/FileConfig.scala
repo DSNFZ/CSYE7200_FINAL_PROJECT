@@ -11,9 +11,9 @@ package com.edu.neu.csye7200.finalproject.configure
 
 object FileConfig {
   val dataDir = "input/"
-  val ratingFile = dataDir + "ratings_small.csv"
+  val ratingFile = dataDir + "ratings.csv"
   val movieFile = dataDir + "movies_metadata.csv"
-  val linkFile = dataDir + "links_small.csv"
+  val linkFile = dataDir + "links.csv"
   val keywordsFile = dataDir + "keywords.csv"
   val creditFIle = dataDir + "credits.csv"
 }
