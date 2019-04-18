@@ -21,7 +21,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-You need to have 'scala' and 'spark' installed.
+You need to have `scala` and `spark` installed.
 * [Scala Installation Instruction](https://www.scala-lang.org/download/)
 * [Spark Installation Instruction](http://spark.apache.org/docs/latest/building-spark.html)
 
