@@ -45,8 +45,8 @@ object ALSUtil {
       val model = ALS.train(trainSet, rank, iter, lambda)
       val validationRmse = computeRmse(model, validationSet)
 
-//      println("RMSE(validation) = " + validationRmse + "with rank = " + rank
-//        + ", iter = " + iter + ", lambda = " + lambda)
+      println("RMSE(validation) = " + validationRmse + "with rank = " + rank
+        + ", iter = " + iter + ", lambda = " + lambda)
 
       if (validationRmse < bestRmse) {
         bestModel = Some(model)
